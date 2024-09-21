@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CameraAlt as CameraAltIcon } from "@mui/icons-material";
+import { server } from "../constants/config.js";
 import {
   Avatar,
   Button,
@@ -13,7 +14,10 @@ import {
 import { VisuallyHiddenInput } from "../components/Styles/StyledComponents";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { usernameValidator } from "../utils/validators";
-
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { userExists } from "../redux/reducers/auth";
+import toast from "react-hot-toast";
 const Logedin = () => {
   const [islogin, setIsLogin] = useState(true);
   const toggleButton = () => setIsLogin((prev) => !prev);
@@ -22,11 +26,55 @@ const Logedin = () => {
   const username = useInputValidation("", usernameValidator);
   const password = useStrongPassword("");
   const avtar = useFileHandler("single");
-  const handleLogin = (e) => {
+  const dispatch = useDispatch();
+  const handleLogin = async (e) => {
     e.preventDefault();
+    const config = {
+      withCredentials: true,
+      header: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const { data } = await axios.post(
+        `${server}/api/v1/user/login`,
+        {
+          username: username.value,
+          password: password.value,
+        },
+        config
+      );
+      dispatch(userExists(true));
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
   };
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("avtar", avtar.file);
+    formData.append("name", name.value);
+    formData.append("bio", bio.value);
+    formData.append("username", username.value);
+    formData.append("password", password.value);
+    const config = {
+      withCredentials: true,
+      header: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+    try {
+      const { data } = await axios.post(
+        `${server}/api/v1/user/new`,
+        formData,
+        config
+      );
+      dispatch(userExists(true));
+      toast(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
   };
   return (
     <div
