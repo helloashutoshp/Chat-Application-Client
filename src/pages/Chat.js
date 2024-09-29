@@ -25,6 +25,7 @@ const Chat = () => {
     setFileMenuOpen(false);
   };
   return (
+    <AppLayout>
     <>
       <Stack
         ref={containerRef}
@@ -85,7 +86,8 @@ const Chat = () => {
         />
       )}
     </>
+    </AppLayout>
   );
 };
 
-export default AppLayout()(Chat);
+export default Chat;

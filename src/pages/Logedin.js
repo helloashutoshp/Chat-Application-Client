@@ -71,7 +71,7 @@ const Logedin = () => {
         config
       );
       dispatch(userExists(true));
-      toast(data.message);
+      toast.success(data.message);
     } catch (error) {
       toast.error(error?.response?.data?.message);
     }

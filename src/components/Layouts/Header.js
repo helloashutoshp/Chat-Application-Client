@@ -18,23 +18,32 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom-v5-compat";
 import { blue } from "../../constants/color";
+import axios from "axios";
+import { server } from "../../constants/config";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { userNotExists } from "../../redux/reducers/auth";
+import { setIsMobile, setIsNotification, setIsSearch } from "../../redux/reducers/misc";
 
 const Header = () => {
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
+
+  const {isSearch,isNotification} = useSelector((state) => state.misc);
+
+  // const [isSearch, setIsSearch] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
-  const [isNotification, setIsNotification] = useState(false);
+  // const [isNotification, setIsNotification] = useState(false);
   const Search = lazy(() => import("../Specific/Search"));
   const NotificationDialog = lazy(() => import("../Specific/Notifications"));
   const GroupDialog = lazy(() => import("../Specific/GroupsDialogue"));
+  const dispatch = useDispatch();
 
   const handleMobile = () => {
-    setIsMobile((prev) => !prev);
+    dispatch(setIsMobile(true));
   };
 
   const openSearch = () => {
-    setIsSearch((prev) => !prev);
+    dispatch(setIsSearch(true));
   };
 
   const openNewGroup = () => {
@@ -42,7 +51,7 @@ const Header = () => {
   };
 
   const openNotifications = () => {
-    setIsNotification((prev) => !prev);
+    dispatch(setIsNotification(true));
   };
 
   const navigateGroup = () => {
@@ -51,8 +60,17 @@ const Header = () => {
     });
   };
 
-  const logoutHandler = () => {
-    console.log("hello");
+
+  const logoutHandler = async () => {
+    try {
+      const { data } = await axios.get(`${server}/api/v1/user/logout`, {
+        withCredentials: true,
+      });
+      dispatch(userNotExists());
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
   };
 
   return (
@@ -64,7 +82,7 @@ const Header = () => {
               variant="h5"
               sx={{ display: { xs: "none", sm: "block" } }}
             >
-               Alochana
+              Alochana
             </Typography>
             <Box sx={{ display: { xs: "block", sm: "none" } }}>
               <IconButton color="inherit" onClick={handleMobile}>

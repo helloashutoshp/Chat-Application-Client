@@ -6,6 +6,7 @@ const UserItem = ({ user, handler, handlerIsLoading,isAdded,styling = {} }) => {
   // console.log(avtar);
   return (
     <ListItem>
+      {/* console.log(avtar); */}
       <Stack
         direction={"row"}
         alignItems={"center"}
@@ -13,7 +14,7 @@ const UserItem = ({ user, handler, handlerIsLoading,isAdded,styling = {} }) => {
         width={"100%"}
         {...styling}
       >
-        <Avatar />
+        <Avatar src={avtar}/>
         <Typography
           variant="body1"
           sx={{
