@@ -10,21 +10,43 @@ import {
 } from "@mui/material";
 import React, { memo } from "react";
 import { sampleNotifications } from "../../constants/SampleData";
-import { useGetNotificationQuery } from "../../redux/api/api";
+import {
+  useAcceptFriendRequestMutation,
+  useGetNotificationQuery,
+} from "../../redux/api/api";
 import { useErrors } from "../../hooks/hook";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsNotification } from "../../redux/reducers/misc";
+import toast from "react-hot-toast";
 const Notifications = () => {
   const { isLoading, data, error, isError } = useGetNotificationQuery();
+  // console.log("data ia ", data);
 
   useErrors([{ error, isError }]);
-  const friendRequestHandler = ({ _id, accept }) => {};
+  const [acceptFrndRequest] = useAcceptFriendRequestMutation();
+  const friendRequestHandler = async ({ _id, accept }) => {
+    dispatch(setIsNotification(false));
+    try {
+      const res = await acceptFrndRequest({ requestId: _id, accept });
+      console.log("response is ",res);
+      if (res.data?.success == 1) {
+        console.log("sub response is",res.data.message);
+        toast.success(res.data?.message);
+      } else {
+        console.log("sub error is",res.data.error);
+        toast.error(res.data?.message || "Something went wrong");
+      }
+    } catch (error) {
+      toast.error("Something went wrong2");
+      console.log("main error is",error);
+    }
+  };
   const dispatch = useDispatch();
   const closeNotificationHandler = () => {
     dispatch(setIsNotification(false));
-  }
-  const{isNotification} = useSelector((state) => state.misc);
-   return (
+  };
+  const { isNotification } = useSelector((state) => state.misc);
+  return (
     <Dialog open={isNotification} onClose={closeNotificationHandler}>
       <Stack
         p={{ xs: "1rem", sm: "2rem" }}
@@ -36,7 +58,6 @@ const Notifications = () => {
           <Skeleton />
         ) : (
           <>
-            {" "}
             {data.allRequest?.length > 0 ? (
               data.allRequest?.map(({ sender, _id }) => (
                 <Notification

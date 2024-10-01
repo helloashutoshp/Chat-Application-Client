@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 import  moment  from "moment";
 const Profile = ({user}) => {
-  console.log(user);
+  // console.log(user);
   return (
     <div>
       <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>

@@ -10,6 +10,7 @@ import { useMyChatsQuery } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsMobile } from "../../redux/reducers/misc";
 import { useErrors } from "../../hooks/hook";
+import { useSocket } from "../../utils/socket";
 
 const getQueryParams = (search) => {
   const params = new URLSearchParams(search);
@@ -20,10 +21,12 @@ const getQueryParams = (search) => {
 
 const AppLayout = ({ children }) => {
   const dispatch = useDispatch();
+  const socket = useSocket();
+  console.log("socket",socket.id);
   const { isMobile } = useSelector((state) => state.misc);
   const { user } = useSelector((state) => state.auth);
   const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
-  console.log(data);
+  // console.log(data);
   useErrors([{isError,error}])
   const { chatId } = getQueryParams(window.location.search);
   const handleDeleteChat = (e, _id, groupChat) => {

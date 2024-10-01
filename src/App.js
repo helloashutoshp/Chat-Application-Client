@@ -7,6 +7,7 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { userExists, userNotExists } from "./redux/reducers/auth.js";
 import { Toaster } from "react-hot-toast";
+import { SocketProvider } from "./utils/socket.js";
 // import dotenv from "dotenv";
 
 // import Home from "./pages/Home";
@@ -29,8 +30,8 @@ const App = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     axios
-      .get(`${server}/api/v1/user/profile`,{withCredentials:true})
-      .then(({data}) => dispatch(userExists(data.user)))
+      .get(`${server}/api/v1/user/profile`, { withCredentials: true })
+      .then(({ data }) => dispatch(userExists(data.user)))
       .catch((err) => dispatch(userNotExists()));
   }, [dispatch]);
   return loader ? (
@@ -39,7 +40,13 @@ const App = () => {
     <BrowserRouter>
       <Suspense fallback={<Loaderlayout />}>
         <Routes>
-          <Route element={<ProtectRoute user={user} />}>
+          <Route
+            element={
+              <SocketProvider>
+                <ProtectRoute user={user} />
+              </SocketProvider>
+            }
+          >
             <Route path="/" element={<Home />} />
             <Route path="/chat/:chatId" element={<Chat />} />
             <Route path="/groups" element={<Groups />} />
@@ -61,7 +68,7 @@ const App = () => {
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
-      <Toaster position="bottom-center"/>
+      <Toaster position="bottom-center" />
     </BrowserRouter>
   );
 };
